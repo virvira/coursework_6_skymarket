@@ -42,10 +42,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
+    "rest_framework_simplejwt",
+    "djoser",
     "users",
     "ads",
     "redoc",
+    "drf_spectacular",
+    "django_filters",
+    "django_rest_passwordreset"
 ]
 
 
@@ -80,11 +86,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "skymarket.wsgi.application"
 
+
 # TODO здесь мы настраиваем аутентификацию и пагинацию
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+            "rest_framework_simplejwt.authentication.JWTAuthentication",
+        ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 5
 }
 # TODO здесь мы настраиваем Djoser
 DJOSER = {
+    "SERIALIZERS": {
+            "user_create": "users.serializers.UserRegistrationSerializer",
+            "user_update": "users.serializers.UserUpdateSerializer",
+            "current_user": "users.serializers.UserUpdateSerializer"
+        },
+    "LOGIN_FIELD": "email",
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}"
 }
 
 # Database
@@ -92,8 +112,15 @@ DJOSER = {
 
 # TODO здесь необходимо настроить подключение к БД
 DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'skymarket',
+        'USER': 'skymarket',
+        'PASSWORD': 'skymarket',
+        'HOST': 'localhost',
+        'PORT': '5433',
+    }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -145,11 +172,22 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Include Email Backend
-# TODO эти переменные мы добавили чтобы помочь Вам настроить почтовый ящик на django.
-# TODO теперь Вам необходимо создать файл .env на основе .env.example
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_USE_SSL = False
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.mail.ru")
 EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+DEFAULT_FROM_EMAIL = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+DOMAIN = os.environ.get("DOMAIN")
+
+# EMAIL_HOST = "smtp.mail.ru"
+# EMAIL_PORT = 2525
+# EMAIL_HOST_USER = "skypro_v_test@mail.ru"
+# DEFAULT_FROM_EMAIL = "skypro_v_test@mail.ru"
+# EMAIL_HOST_PASSWORD = "bseizhCKX5UxwtbWCSwY"
+# DOMAIN = "localhost:3000"
+
+AUTH_USER_MODEL = "users.User"
+
